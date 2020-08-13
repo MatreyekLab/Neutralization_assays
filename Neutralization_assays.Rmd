@@ -31,7 +31,7 @@ SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = eleme
   geom_point(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
 
 VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
-  scale_x_log10() +  scale_y_log10(limits = c(1E-3,3)) + ggtitle("VSV-G pseudovirus") +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("VSV-G pseudovirus") +
   labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
   geom_hline(yintercept = d200813[d200813$serum == "none","norm_red"], linetype = 2) +
   geom_line(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
