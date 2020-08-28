@@ -14,24 +14,39 @@ library(ggpubr)
 
 ```{r Read in data}
 d200813 <- read.csv(file = "data/200813_attune.csv", header = T, stringsAsFactors = F)
+d200814 <- read.csv(file = "data/200814_attune.csv", header = T, stringsAsFactors = F)
+d200817 <- read.csv(file = "data/200817_attune.csv", header = T, stringsAsFactors = F)
+d200824 <- read.csv(file = "data/200824_lsr2.csv", header = T, stringsAsFactors = F)
+d200828 <- read.csv(file = "data/200828_attune.csv", header = T, stringsAsFactors = F)
 ```
 
 ```{r Normalize the data}
 d200813$norm_grn <- d200813$pct_grn / d200813[d200813$serum == "none","pct_grn"]
 d200813$norm_red <- d200813$pct_red / d200813[d200813$serum == "none","pct_red"]
+
+d200814$norm_grn <- d200814$pct_grn / d200814[d200814$serum == "none","pct_grn"]
+d200814$norm_red <- d200814$pct_red / d200814[d200814$serum == "none","pct_red"]
+
+d200817$norm_grn <- d200817$pct_grn / d200817[d200817$serum == "none","pct_grn"]
+d200817$norm_red <- d200817$pct_red / d200817[d200817$serum == "none","pct_red"]
+
+d200824$norm_bfp <- d200824$pct_bfp / d200824[d200824$serum == "none","pct_bfp"]
+d200824$norm_grn <- d200824$pct_grn / d200824[d200824$serum == "none","pct_grn"]
+d200824$norm_red <- d200824$pct_red / d200824[d200824$serum == "none","pct_red"]
+
+d200828$norm_grn <- d200828$pct_grn / mean(d200828[d200828$serum == "none","pct_grn"])
 ```
 
-
-```{r Plot the data}
+```{r expt1}
 SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
-  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
   labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
   geom_hline(yintercept = d200813[d200813$serum == "none","norm_grn"], linetype = 2) +
   geom_line(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
   geom_point(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
 
 VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
-  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("VSV-G pseudovirus") +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("VSV-G pseudovirus") +
   labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
   geom_hline(yintercept = d200813[d200813$serum == "none","norm_red"], linetype = 2) +
   geom_line(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
@@ -39,6 +54,202 @@ VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = elemen
 
 arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
 
-ggsave(file = "plots/arranged_plot.pdf", arranged_plot, height = 3, width = 6)
+ggsave(file = "plots/Neutralization_results_1.pdf", arranged_plot, height = 3, width = 6)
 ```
+
+```{r expt2}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200814[d200814$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+
+VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("VSV-G pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200814[d200814$serum == "none","norm_red"], linetype = 2) +
+  geom_line(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+
+arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+
+ggsave(file = "plots/Neutralization_results_2.pdf", arranged_plot, height = 3, width = 6)
+```
+
+```{r expt3}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200817[d200817$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+
+VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10(limits = c(10,3e3)) +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("VSV-G pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200817[d200817$serum == "none","norm_red"], linetype = 2) +
+  geom_line(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+
+arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+
+ggsave(file = "plots/Neutralization_results_3.pdf", arranged_plot, height = 3, width = 6)
+```
+
+```{r expt4}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200824[d200824$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
+
+Chimera_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200824[d200824$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum)) +
+  geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum))
+Chimera_pseudovirus_plot
+
+Chimera_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200824[d200824$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+Chimera_pseudovirus_plot2
+
+arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot
+
+ggsave(file = "plots/Neutralization_results_4.pdf", arranged_plot, height = 3, width = 6)
+
+
+d200824$sars2_mean <- rowMeans(d200824[,c("norm_grn", "norm_bfp")])
+
+Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS2-RBDs") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200824[d200824$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
+Combined_neut_plot
+```
+```{r expt5}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10(limits = c(10,1e5)) +  scale_y_log10(limits = c(8E-3,3)) + 
+  ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = mean(d200828[d200828$serum == "none","norm_grn"]), linetype = 2) +
+  geom_line(data = d200828 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200828 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
+
+ggsave(file = "plots/Neutralization_results_5.pdf", SARS2_pseudovirus_plot, height = 3, width = 6)
+```
+
+
+
+
+
+```{r IC50 curves for infections across multiple replicates}
+d200813_model <- drm(data = d200813, formula = norm_grn ~ dilution, fct=LL.5())
+```
+
+
+```{r Expt4 making IC50 curve for infections }
+if (!require("drc")) {
+  install.packages("drc", dependencies = TRUE)
+  library(drc)}
+
+dose_calc <- d200824 %>% filter(serum == "JF5A_Pos")
+dose_calc2 <- dose_calc[,c("dilution","sars2_mean")]
+
+#dose_calc_model <-drm(formula = dose_calc$norm_grn ~ dose_calc$dilution, fct = LL.4(names = c("Slope", "Lower Limit", "Upper Limit", "ED50")),upperl = c(Inf,0.001,100,Inf), lowerl = c(-Inf,0,99.999,-Inf))
+#summary(dose_calc_model)
+
+#https://stackoverflow.com/questions/27297241/effective-dose-ed-in-the-drc-package
+ryegrass.m0 <- drm(rootl ~ conc, data = ryegrass, fct = LL.4(names=c("Slope","Lower Limit","Upper Limit","ED50")))
+summary(ryegrass.m0)
+plot(ryegrass.m0, broken=TRUE, xlab="Dose (mM)", ylab="Root length (cm)", lwd=2,  cex=1.2, cex.axis=1.2, ex.lab=1.2)
+
+
+mod2 <- drm(data = dose_calc2, formula = sars2_mean ~ dilution, fct=LL.5())
+summary(mod2)
+plot(mod2, broken=TRUE, xlab="Dilution", ylab="Norm SARS2 infection", lwd=2, cex=1.2, cex.axis=1.2, ex.lab=1.2)
+
+ic_200824 <- ED(object = mod2, respLev = c(10,50,90), interval = "delta")
+
+
+#mod1 <- drm(sars2_mean ~ dilution, data = dose_calc, type ="binomial", fct=LL.2())
+#ED(mod1, c(10, 20, 50, 90, 99), interval = "delta", reference = "control")
+
+ic_200824 <- ED(object = mod2, respLev = c(10,50,90), interval = "delta")
+ic_200824_df <- data.frame(ic_200824)
+
+#ic_200824_lower <- ED(mod1, c(10), interval = "delta")[3]
+#ic_200824_upper <- ED(mod1, c(10), interval = "delta")[4]
+
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_vline(xintercept = ic_200824_df[1,1], linetype = 2) + geom_vline(xintercept = ic_200824_df[2,1], linetype = 3)
+SARS2_pseudovirus_plot
+```
+
+```{r Expt5 making IC50 curve for infections }
+if (!require("drc")) {
+  install.packages("drc", dependencies = TRUE)
+  library(drc)}
+
+dose_calc <- d200828 %>% filter(serum == "JF5A_Pos")
+dose_calc2 <- dose_calc[,c("dilution","norm_grn")]
+
+#dose_calc_model <-drm(formula = dose_calc$norm_grn ~ dose_calc$dilution, fct = LL.4(names = c("Slope", "Lower Limit", "Upper Limit", "ED50")),upperl = c(Inf,0.001,100,Inf), lowerl = c(-Inf,0,99.999,-Inf))
+#summary(dose_calc_model)
+
+#https://stackoverflow.com/questions/27297241/effective-dose-ed-in-the-drc-package
+ryegrass.m0 <- drm(rootl ~ conc, data = ryegrass, fct = LL.4(names=c("Slope","Lower Limit","Upper Limit","ED50")))
+summary(ryegrass.m0)
+plot(ryegrass.m0, broken=TRUE, xlab="Dose (mM)", ylab="Root length (cm)", lwd=2,  cex=1.2, cex.axis=1.2, ex.lab=1.2)
+
+
+mod2 <- drm(data = dose_calc2, formula = norm_grn ~ dilution, fct=LL.5())
+summary(mod2)
+plot(mod2, broken=TRUE, xlab="Dilution", ylab="Norm SARS2 infection", lwd=2, cex=1.2, cex.axis=1.2, ex.lab=1.2)
+
+ic_200828 <- ED(object = mod2, respLev = c(10,50,90), interval = "delta")
+
+
+#mod1 <- drm(norm_grn ~ dilution, data = dose_calc, type ="binomial", fct=LL.2())
+#ED(mod1, c(10, 20, 50, 90, 99), interval = "delta", reference = "control")
+
+ic_200828 <- ED(object = mod2, respLev = c(10,50,90), interval = "delta")
+ic_200828_df <- data.frame(ic_200828)
+
+#ic_200828_lower <- ED(mod1, c(10), interval = "delta")[3]
+#ic_200828_upper <- ED(mod1, c(10), interval = "delta")[4]
+
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = d200828 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200828 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_vline(xintercept = ic_200828_df[1,1], linetype = 2) + geom_vline(xintercept = ic_200828_df[2,1], linetype = 3)
+SARS2_pseudovirus_plot
+```
+
+```{r}
+ic50_ic90_summaries <- data.frame("expt" = c(200824,200828), "ic90" = c(ic_200824_df[1,1],ic_200828_df[1,1]), "ic50" = c(ic_200824_df[2,1],ic_200828_df[2,1]))
+
+
+
+```
+
+
 
