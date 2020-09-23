@@ -8,8 +8,10 @@ output: html_document
 ```{r setup, include=FALSE}
 rm(list = ls())
 library(tidyverse)
-#library(gridExtra)
-library(ggpubr)
+library(gridExtra)
+#install.packages("xlsx", dependencies = TRUE)  
+#install.packages("ggpubr", dependencies = TRUE)
+#library(ggpubr) #error: there is no package called ‘openxlsx’
 ```
 
 ```{r Read in data}
@@ -18,6 +20,7 @@ d200814 <- read.csv(file = "data/200814_attune.csv", header = T, stringsAsFactor
 d200817 <- read.csv(file = "data/200817_attune.csv", header = T, stringsAsFactors = F)
 d200824 <- read.csv(file = "data/200824_lsr2.csv", header = T, stringsAsFactors = F)
 d200828 <- read.csv(file = "data/200828_attune.csv", header = T, stringsAsFactors = F)
+d200923 <- read.csv(file = "data/200923_attune.csv", header = T, stringsAsFactors = F)
 ```
 
 ```{r Normalize the data}
@@ -35,6 +38,11 @@ d200824$norm_grn <- d200824$pct_grn / d200824[d200824$serum == "none","pct_grn"]
 d200824$norm_red <- d200824$pct_red / d200824[d200824$serum == "none","pct_red"]
 
 d200828$norm_grn <- d200828$pct_grn / mean(d200828[d200828$serum == "none","pct_grn"])
+
+d200923$norm_bfp <- d200923$pct_bfp / d200923[d200923$serum == "none","pct_bfp"]
+d200923$norm_grn <- d200923$pct_grn / d200923[d200923$serum == "none","pct_grn"]
+d200923$norm_red <- d200923$pct_red / d200923[d200923$serum == "none","pct_red"]
+
 ```
 
 ```{r expt1}
@@ -52,7 +60,8 @@ VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = elemen
   geom_line(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
   geom_point(data = d200813 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
 
-arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1)
 
 ggsave(file = "plots/Neutralization_results_1.pdf", arranged_plot, height = 3, width = 6)
 ```
@@ -72,7 +81,8 @@ VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = elemen
   geom_line(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
   geom_point(data = d200814 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
 
-arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1)
 
 ggsave(file = "plots/Neutralization_results_2.pdf", arranged_plot, height = 3, width = 6)
 ```
@@ -92,7 +102,8 @@ VSVG_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = elemen
   geom_line(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
   geom_point(data = d200817 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
 
-arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, VSVG_pseudovirus_plot, ncol=2, nrow=1)
 
 ggsave(file = "plots/Neutralization_results_3.pdf", arranged_plot, height = 3, width = 6)
 ```
@@ -122,7 +133,9 @@ Chimera_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = el
   geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
 Chimera_pseudovirus_plot2
 
-arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1)
+
 arranged_plot
 
 ggsave(file = "plots/Neutralization_results_4.pdf", arranged_plot, height = 3, width = 6)
@@ -138,6 +151,7 @@ Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_b
   geom_point(data = d200824 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
 Combined_neut_plot
 ```
+
 ```{r expt5}
 SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
   scale_x_log10(limits = c(10,1e5)) +  scale_y_log10(limits = c(8E-3,3)) + 
@@ -150,6 +164,51 @@ SARS2_pseudovirus_plot
 
 ggsave(file = "plots/Neutralization_results_5.pdf", SARS2_pseudovirus_plot, height = 3, width = 6)
 ```
+
+```{r expt6 First attempt with individual sera}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200923[d200923$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
+
+SARS1_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1e-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200923[d200923$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum)) +
+  geom_point(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum))
+SARS1_pseudovirus_plot
+
+ZdM_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200923[d200923$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+ZdM_pseudovirus_plot2
+
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, SARS1_pseudovirus_plot, ZdM_pseudovirus_plot2, ncol=3, nrow=1)
+
+arranged_plot
+
+ggsave(file = "plots/Neutralization_results_6.pdf", arranged_plot, height = 3, width = 8)
+
+
+d200923$sars2_mean <- rowMeans(d200923[,c("norm_grn", "norm_bfp")])
+
+Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS2-RBDs") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200923[d200923$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d200923 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
+Combined_neut_plot
+```
+
 
 
 
