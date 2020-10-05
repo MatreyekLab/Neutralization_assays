@@ -20,7 +20,10 @@ d200814 <- read.csv(file = "data/200814_attune.csv", header = T, stringsAsFactor
 d200817 <- read.csv(file = "data/200817_attune.csv", header = T, stringsAsFactors = F)
 d200824 <- read.csv(file = "data/200824_lsr2.csv", header = T, stringsAsFactors = F)
 d200828 <- read.csv(file = "data/200828_attune.csv", header = T, stringsAsFactors = F)
-d200923 <- read.csv(file = "data/200923_attune.csv", header = T, stringsAsFactors = F)
+d200923 <- read.csv(file = "data/200923_attune.csv", header = T, stringsAsFactors = F) %>% mutate(date = "200923")
+d200924 <- read.csv(file = "data/200924_attune.csv", header = T, stringsAsFactors = F) %>% mutate(date = "200924")
+d200930 <- read.csv(file = "data/200930_attune.csv", header = T, stringsAsFactors = F) %>% mutate(date = "200930")
+d201005 <- read.csv(file = "data/201005_attune.csv", header = T, stringsAsFactors = F) %>% mutate(date = "201005")
 ```
 
 ```{r Normalize the data}
@@ -43,6 +46,17 @@ d200923$norm_bfp <- d200923$pct_bfp / d200923[d200923$serum == "none","pct_bfp"]
 d200923$norm_grn <- d200923$pct_grn / d200923[d200923$serum == "none","pct_grn"]
 d200923$norm_red <- d200923$pct_red / d200923[d200923$serum == "none","pct_red"]
 
+d200924$norm_bfp <- d200924$pct_bfp / d200924[d200924$serum == "none","pct_bfp"]
+d200924$norm_grn <- d200924$pct_grn / d200924[d200924$serum == "none","pct_grn"]
+d200924$norm_red <- d200924$pct_red / d200924[d200924$serum == "none","pct_red"]
+
+d200930$norm_bfp <- d200930$pct_bfp / d200930[d200930$serum == "none","pct_bfp"]
+d200930$norm_grn <- d200930$pct_grn / d200930[d200930$serum == "none","pct_grn"]
+d200930$norm_red <- d200930$pct_red / d200930[d200930$serum == "none","pct_red"]
+
+d201005$norm_bfp <- d201005$pct_bfp / d201005[d201005$serum == "none","pct_bfp"]
+d201005$norm_grn <- d201005$pct_grn / d201005[d201005$serum == "none","pct_grn"]
+d201005$norm_red <- d201005$pct_red / d201005[d201005$serum == "none","pct_red"]
 ```
 
 ```{r expt1}
@@ -165,6 +179,14 @@ SARS2_pseudovirus_plot
 ggsave(file = "plots/Neutralization_results_5.pdf", SARS2_pseudovirus_plot, height = 3, width = 6)
 ```
 
+
+
+
+
+
+
+
+
 ```{r expt6 First attempt with individual sera}
 SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
   scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("SARS CoV-2 pseudovirus") +
@@ -192,11 +214,8 @@ ZdM_pseudovirus_plot2
 
 #arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
 arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, SARS1_pseudovirus_plot, ZdM_pseudovirus_plot2, ncol=3, nrow=1)
-
 arranged_plot
-
 ggsave(file = "plots/Neutralization_results_6.pdf", arranged_plot, height = 3, width = 8)
-
 
 d200923$sars2_mean <- rowMeans(d200923[,c("norm_grn", "norm_bfp")])
 
@@ -209,7 +228,246 @@ Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_b
 Combined_neut_plot
 ```
 
+```{r expt7 First attempt with individual sera}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200924[d200924$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
 
+SARS1_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1e-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200924[d200924$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum)) +
+  geom_point(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum))
+SARS1_pseudovirus_plot
+
+ZdM_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200924[d200924$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+ZdM_pseudovirus_plot2
+
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, SARS1_pseudovirus_plot, ZdM_pseudovirus_plot2, ncol=3, nrow=1)
+arranged_plot
+ggsave(file = "plots/Neutralization_results_7.pdf", arranged_plot, height = 3, width = 8)
+
+d200924$sars2_mean <- rowMeans(d200924[,c("norm_grn", "norm_bfp")])
+
+Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS2-RBDs") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200924[d200924$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d200924 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
+Combined_neut_plot
+```
+
+
+```{r expt8 First attempt with individual sera}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200930[d200930$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
+
+SARS1_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1e-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200930[d200930$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum)) +
+  geom_point(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum))
+SARS1_pseudovirus_plot
+
+ZdM_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200930[d200930$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+ZdM_pseudovirus_plot2
+
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, SARS1_pseudovirus_plot, ZdM_pseudovirus_plot2, ncol=3, nrow=1)
+arranged_plot
+ggsave(file = "plots/Neutralization_results_8.pdf", arranged_plot, height = 3, width = 8)
+
+d200930$sars2_mean <- rowMeans(d200930[,c("norm_grn", "norm_bfp")])
+
+Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS2-RBDs") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d200930[d200930$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d200930 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
+Combined_neut_plot
+```
+
+```{r expt9 First attempt with individual sera}
+SARS2_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("SARS CoV-2 pseudovirus") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d201005[d201005$serum == "none","norm_grn"], linetype = 2) +
+  geom_line(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum)) +
+  geom_point(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_grn, color = serum))
+SARS2_pseudovirus_plot
+
+SARS1_pseudovirus_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1e-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d201005[d201005$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum)) +
+  geom_point(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_bfp, color = serum))
+SARS1_pseudovirus_plot
+
+ZdM_pseudovirus_plot2 <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(1E-1,1.3)) + ggtitle("Chimeric") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d201005[d201005$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum)) +
+  geom_point(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = norm_red, color = serum))
+ZdM_pseudovirus_plot2
+
+#arranged_plot <- ggarrange(SARS2_pseudovirus_plot, Chimera_pseudovirus_plot, ncol=2, nrow=1, common.legend = TRUE, legend="top")
+arranged_plot <- grid.arrange(SARS2_pseudovirus_plot, SARS1_pseudovirus_plot, ZdM_pseudovirus_plot2, ncol=3, nrow=1)
+arranged_plot
+ggsave(file = "plots/Neutralization_results_9.pdf", arranged_plot, height = 3, width = 8)
+
+d201005$sars2_mean <- rowMeans(d201005[,c("norm_grn", "norm_bfp")])
+
+Combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank()) +
+  scale_x_log10() +  scale_y_log10(limits = c(8E-3,3)) + ggtitle("SARS2-RBDs") +
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_hline(yintercept = d201005[d201005$serum == "none","norm_blue"], linetype = 2) +
+  geom_line(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum)) +
+  geom_point(data = d201005 %>% filter(serum != "none"), aes(x = dilution, y = sars2_mean, color = serum))
+Combined_neut_plot
+```
+
+
+
+```{r Replicates}
+combined_neut_replicates <- rbind(d200923, d200924, d200930, d201005)
+highlighted_samples <- c("JF5_neg", "JF5_pos")
+
+individual_sera_highlight <- combined_neut_replicates %>% filter(serum %in% highlighted_samples) %>% 
+  mutate(log_norm_blu = log10(norm_bfp), log_norm_grn = log10(norm_grn), log_norm_red = log10(norm_red), count = 1)
+individual_sera_other <- combined_neut_replicates %>% filter(!(serum %in% highlighted_samples)) %>% 
+  mutate(log_norm_blu = log10(norm_bfp), log_norm_grn = log10(norm_grn), log_norm_red = log10(norm_red), count = 1)
+
+## These are the samples I want to have colored and have legends for
+individual_sera_highlight_summarized <- individual_sera_highlight %>% group_by(serum, dilution) %>% 
+  summarize(grn_log_ave = mean(log_norm_grn), blu_log_ave = mean(log_norm_blu), red_log_ave = mean(log_norm_red),
+            grn_log_sd = sd(log_norm_grn), blu_log_sd = sd(log_norm_blu), red_log_sd = sd(log_norm_red), count = sum(count))
+
+individual_sera_highlight_summarized$grn_geomean <- 10^individual_sera_highlight_summarized$grn_log_ave
+individual_sera_highlight_summarized$blu_geomean <- 10^individual_sera_highlight_summarized$blu_log_ave
+individual_sera_highlight_summarized$red_geomean <- 10^individual_sera_highlight_summarized$red_log_ave
+individual_sera_highlight_summarized$grn_upper_ci <- 10^(individual_sera_highlight_summarized$grn_log_ave + individual_sera_highlight_summarized$grn_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+individual_sera_highlight_summarized$grn_lower_ci <- 10^(individual_sera_highlight_summarized$grn_log_ave - individual_sera_highlight_summarized$grn_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+individual_sera_highlight_summarized$blu_upper_ci <- 10^(individual_sera_highlight_summarized$blu_log_ave + individual_sera_highlight_summarized$blu_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+individual_sera_highlight_summarized$blu_lower_ci <- 10^(individual_sera_highlight_summarized$blu_log_ave - individual_sera_highlight_summarized$blu_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+individual_sera_highlight_summarized$red_upper_ci <- 10^(individual_sera_highlight_summarized$red_log_ave + individual_sera_highlight_summarized$red_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+individual_sera_highlight_summarized$red_lower_ci <- 10^(individual_sera_highlight_summarized$red_log_ave - individual_sera_highlight_summarized$red_log_sd/sqrt(individual_sera_highlight_summarized$count-1)*1.96)
+
+## Add upper and lower SE until I get the rest of my replicates
+individual_sera_highlight_summarized$grn_upper_se <- 10^(individual_sera_highlight_summarized$grn_log_ave + individual_sera_highlight_summarized$grn_log_sd/sqrt(individual_sera_highlight_summarized$count-1))
+individual_sera_highlight_summarized$grn_lower_se <- 10^(individual_sera_highlight_summarized$grn_log_ave - individual_sera_highlight_summarized$grn_log_sd/sqrt(individual_sera_highlight_summarized$count-1))
+individual_sera_highlight_summarized$blu_upper_se <- 10^(individual_sera_highlight_summarized$blu_log_ave + individual_sera_highlight_summarized$blu_log_sd/sqrt(individual_sera_highlight_summarized$count-1))
+individual_sera_highlight_summarized$blu_lower_se <- 10^(individual_sera_highlight_summarized$blu_log_ave - individual_sera_highlight_summarized$blu_log_sd/sqrt(individual_sera_highlight_summarized$count-1))
+
+
+## Now also do this for the ones I don't want colored in b/c it makes the plot too crowded
+individual_sera_other_summarized <- individual_sera_other %>% group_by(serum, dilution) %>% 
+  summarize(grn_log_ave = mean(log_norm_grn), blu_log_ave = mean(log_norm_blu), red_log_ave = mean(log_norm_red),
+            grn_log_sd = sd(log_norm_grn), blu_log_sd = sd(log_norm_blu), red_log_sd = sd(log_norm_red), count = sum(count))
+
+individual_sera_other_summarized$grn_geomean <- 10^individual_sera_other_summarized$grn_log_ave
+individual_sera_other_summarized$blu_geomean <- 10^individual_sera_other_summarized$blu_log_ave
+individual_sera_other_summarized$red_geomean <- 10^individual_sera_other_summarized$red_log_ave
+
+plot_upper_y_limit <- 1.3
+plot_lower_y_limit <- 2e-2
+```
+
+
+```{r Replicate plot to send to David Canaday}
+sars2_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("SARS2") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, color = serum)) +
+  geom_errorbar(data = individual_sera_highlight_summarized, aes(x = dilution, ymin = grn_lower_se, ymax = grn_upper_se, color = serum), alpha = 0.4, width = 0.2) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, color = serum))
+sars2_combined_neut_plot
+
+sars1_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("SARS1") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, color = serum)) +
+  geom_errorbar(data = individual_sera_highlight_summarized, aes(x = dilution, ymin = blu_lower_se, ymax = blu_upper_se, color = serum), alpha = 0.4, width = 0.2) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, color = serum))
+sars1_combined_neut_plot
+
+zdm_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("ZdM") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, color = serum)) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, color = serum))
+zdm_combined_neut_plot
+
+combined_arranged_plot <- grid.arrange(sars2_combined_neut_plot, sars1_combined_neut_plot, ncol=1, nrow=2)
+combined_arranged_plot
+ggsave(file = "plots/Neutralization_results_standard_error.pdf", combined_arranged_plot, height = 4, width = 3)
+```
+
+```{r Replicate plot for Chris King}
+sars2_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("SARS2") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, color = serum)) +
+  geom_errorbar(data = individual_sera_highlight_summarized, aes(x = dilution, ymin = grn_lower_ci, ymax = grn_upper_ci, color = serum), alpha = 0.4, width = 0.2) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = grn_geomean, color = serum))
+sars2_combined_neut_plot
+
+sars1_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("SARS1") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, color = serum)) +
+  geom_errorbar(data = individual_sera_highlight_summarized, aes(x = dilution, ymin = blu_lower_ci, ymax = blu_upper_ci, color = serum), alpha = 0.4, width = 0.2) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = blu_geomean, color = serum))
+sars1_combined_neut_plot
+
+zdm_combined_neut_plot <- ggplot() + theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank()) +
+  ggtitle("ZdM") +
+  scale_x_log10() +  scale_y_log10(limits = c(plot_lower_y_limit,plot_upper_y_limit)) + 
+  labs(x = "Dilution of serum", y = "Fold infection of no-serum") + 
+  geom_line(data = individual_sera_other_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, fill = serum), color = "grey50", alpha = 0.2) +
+  geom_line(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, color = serum)) +
+  geom_point(data = individual_sera_highlight_summarized %>% filter(serum != "none"), aes(x = dilution, y = red_geomean, color = serum))
+zdm_combined_neut_plot
+
+combined_arranged_plot <- grid.arrange(sars2_combined_neut_plot, sars1_combined_neut_plot, ncol=1, nrow=2)
+combined_arranged_plot
+ggsave(file = "plots/Neutralization_results_conf_intervals.pdf", combined_arranged_plot, height = 4, width = 3)
+```
 
 
 
